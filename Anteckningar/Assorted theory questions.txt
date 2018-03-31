@@ -1,0 +1,339 @@
+From exam 2017-08-16
+
+(a) Give a reason for why the language needs the virtual keyword from a viewpoint of [1p]
+the zero overhead principle?
+
+Answer:
+Zero overhead principle: what you don't use, you don't pay for.
+
+The virtual keyword tells the compiler the function can be used in a polymorphic context.
+Polymorhism involves dynamic dispatch during runtime, even if the function isn't overloaded.
+If this was default behaviour for all classes an overhead would be added in all programs -
+even if your class doesn't use poymorhism. This would break the zero overhead principle.
+
+A virtual function comes with some overhead compared to non virtual functions. 
+
+dynamic dispatch = process of selecting hich implementation of a polymorhic operation to
+call at runtime.
+-----------------------------------------------------------------------------------------
+(b) The <functional> header has a lot of function objects that implement simple oper- [1p]
+ations such as std::less implementing operator<. Why do we need these function
+objects?
+
+Answer:
+Mainly to be used as template arguments since it's easier to work with types in template 
+parameters.
+
+-----------------------------------------------------------------------------------------
+(c) Exceptions should be caught by reference. Give two reasons why.
+
+Answer:
+Catching exceptions by value can be a problem when faced with inheritance hierarchies.
+Having ExceptionA inherit from ExceptionB and overriding items (like an error code) causes
+a problem: If an ExceptionA is thrown, the catch block will convert it into a ExceptionB
+which causes the error code to change
+
+1) Memory overhead - bad with unnecessary copies
+2) Slicing, catching with reference opens up for polymorphism.
+
+-----------------------------------------------------------------------------------------
+(d) Suppose that we have a class C with an int member i with a constructor that initializes [1p]
+i with an int value (see below). A problem with this implementation is that we are
+also able to call this constructor with values that are convertible to int. Give the
+declarations needed in the class to give compilation errors when the constructor is
+called with values of type that is convertible to int (i.e. double, long, bool, char etc.).
+
+class C
+{
+	int i;
+	public:
+	C( int v ) : i{v} {}
+};
+
+Answer: This can be solved using templates. By defining a template constructor and then marking
+it with delete, we remove all constructors except the int one that is defined by itself:
+
+class C
+{
+	int i;
+	public:
+	C( int v ) : i{v} {}
+	template <typename T>
+	C(T) = delete; //Remove all of template type
+};
+
+If the constructor is called with int, the standard constructor is called. Any other type 
+will be deleted.
+
+----------------------------------------------------------------------------------------
+(e) What is the difference between the noexcept operator and the noexcept specifier?
+
+The noexcept specifier states that a function will not throw any exceptions.
+Can be written like:
+	void fun() noexcept;
+	void fun() noexcept(true);
+	void fun() noexcept(false); //May throw
+
+The noexcept operator is executed at compile time and takes tge argument expression without
+executing it. It returns either true or false, depending on if the compiler can find something
+in the expression that could throw an exception. The noexcept operator can be used to check
+if a an expression is noexcept or not.
+
+ template <typename T>
+    void swap(T & a, T & b) 
+                            noexcept(  // noexcept specifier
+                                noexcept(  // noexcept operator
+                                    std::is_noexcept_move_constructable_v<T> &&
+                                    std::is_noexcept_move_assignable_v<T>
+                                )
+                            );
+
+----------------------------------------------------------------------------------------
+2017-05-29
+----------------------------------------------------------------------------------------
+1. What does it mean that a type is contextually convertible to bool?
+
+Answer:
+It means that implicit conversion is allowed even if the type is marked as explicit.
+
+A type that is contextually convertible to bool can be used as a boolean expression, for
+example in an if-statement. To make my own convertible type, a type converting operator
+must be implemented. 
+bool is a special case in that even if the operator is marked explicit, the compiler can 
+call it in a situation that requires a type that is contextually convertible.
+
+----------------------------------------------------------------------------------------
+
+2. A function-try-block is sometimes good when defining constructors. Why are they 
+especially good in that use-case?
+
+Answer:
+It is a good way to catch a possible error, should the object not be able to be created
+properly(ex. failure to initialize a data member). This prevents more errors and eventual 
+crashes in the future run time of the program.
+
+---------------------------------------------------------------------------------------
+3. In a template parameter type declaration, you can use typename or class. Does it matter
+which one you use?
+
+Answer:
+No, it doesn't matter which one you use, they are contextually the same (c++17). Some programmers
+may prefer to use typename as using class implies it is a class, which isn't always the case.
+
+Bfore c++17 there was one case you were required to use class(with template template parameters)
+(template <template <..> class C> as opposed to template <template <..> typename T>)
+
+---------------------------------------------------------------------------------------
+4. Why should one avoid to specialize a function template? What is the, often better, alter- [1p]
+native?
+
+Answer:
+Because of function call overload rules. A template function will never have its arguments
+converted by the compiler to match the call. A normal function overload is often better.
+
+// primary template
+template <typename T>
+void fun(T t) { ... }
+
+// specialization for int, will not be called with types
+// convertible to int such as short and long
+template<>
+void fun<int>(int t) { ... }
+
+// Normal function will be matched before using a template
+void fun(int t) { ... }
+
+----------------------------------------------------------------------------------------
+5. In which situation would one chose to declare a destructor pure virtual?
+
+You could use a pure virtual destructor in a base class if you want it to be abstract but 
+have valid implementations for all other virtual functions (or have no other virtual 
+functions). You still have to add an implementation for the destructor:
+u
+
+struct A
+{
+    virtual ~A() = 0;
+};
+A::~A() = default;
+----------------------------------------------------------------------------------------
+2017-04-20
+----------------------------------------------------------------------------------------
+1. Given the following snippet of code, give a reason for having the using declaration on 
+line 4 instead of qualifying the call on line 5 (i.e. return std::begin(range)).
+
+template <typename Range >
+auto iter(Range && range)
+{
+    using std::begin;
+    return begin(range);
+}
+
+Answer:
+A using declaration is used to support ADL. If we have a qualified call here, we would 
+force the compiler to look in std for all possible functions. The problem is that a 
+user-defined type not in the std will of course not have it's begin function in that 
+namespace. The question you might ask yourself now is why that declaration is needed at 
+all, won't ADL take care of calling the correct function anyways? Well most of the time, 
+yes, the problem is the c-style arrays. They are part of the language and not in the std 
+but there is an overload of begin in the library. The using-declaration gives us access 
+to that function.
+
+----------------------------------------------------------------------------------------
+2. Given the following primary template declaration, give a declaration of a specialization 
+of foo for type char.
+
+template <typename T>
+struct foo;
+
+Answer:
+template<>
+struct foo<char>;
+
+---------------------------------------------------------------------------------------
+3. Assuming v is a std::vector<int>, why is the following code wrong?
+
+static_assert(v.size() > 0, "vector is empty!");
+
+Answer:
+static_assert requires a compile time expression as its first argument. This will not work
+as vector::size is runtime.
+
+----------------------------------------------------------------------------------------
+4. Assume you have definitions for the following functions:
+
+void fun(int, short);
+void fun(int, double);
+
+The call fun(2,3) will give an ambiguous overload. Why?
+
+Answer:
+either way, an implicit conversion must be done to the 3, either to a short int(?) or a 
+double.
+
+An int can be implicitly converted to both double and short and both will give possible 
+loss of precision.
+
+---------------------------------------------------------------------------------------
+5. Describe what length below does and give a valid example of a call to length.
+
+template <typename ...Args>
+int length(Args && ... args)
+{
+    return sizeof...(args);
+}
+
+Answer:
+Length returns the number of arguments sent to the function
+---------------------------------------------------------------------------------------
+2017-01-12
+---------------------------------------------------------------------------------------
+1. The standard library has a function std::addressof that is used in generic code to find
+the address of an object. Usually, the operator & is used for finding addresses of 
+objects, why do you think they added a function as well?
+
+Answer:
+In order to differentiate between addresses and refererences
+
+---------------------------------------------------------------------------------------
+2. A forwarding reference and an r-value reference are declared in the same way (Type &&),
+but are semantically very different. Why?
+
+ANswer:
+A forwarding reference is a template parameter defined as T&& such as 
+template <typename T>
+void foo(T && ref)
+{
+
+}
+A forwarding reference will work with any type having any expression categorization due to
+reference collapsing. An r-value reference will only bind to temporaries (r-values).
+----------------------------------------------------------------------------------------
+3. C++14 added generic lambdas. Give an example of a generic lambda and give a definition
+of a function object class that is equivalent to the compiler-generated closure object 
+created by your lambda.
+
+Answer:
+A lambda generates an anonymous closure object according to example below:
+auto l = [](int a){return 2;};
+
+struct __NAME
+{
+    auto operator()(int a) const { return 2; };
+};
+
+A GENERIC lambda is a lambda that takes at least one parameter of type auto which will generate 
+a templated operator():
+
+auto gl = [](auto p) { return 2; };
+
+struct __NAME
+{
+    template <typename T>
+    auto operator()(T p) const { return 2; }
+};
+
+------------------------------------------------------------------------------------------
+4. Why shouldn¡¦t you use operator< when comparing iterators in the code below (container
+is some sort of STL container):
+for ( auto it = begin(container); it < end(container); ++it )
+// do something with it
+
+Answer:
+Only random-access iterators support comparison with operator<. This will not compile with
+containers that doesn't support random-access. Instead operator!= should be used.
+
+----------------------------------------------------------------------------------------
+2016-08-17
+----------------------------------------------------------------------------------------
+1. Consider the following function. Why is this interface a bad design? (hint, think about
+ownership...)
+X* compute(/* some args */)
+{
+X* res = new X{};
+// do something with res
+return res;
+}
+
+Answer:
+By returning a raw pointer, we will leave it up to the user of our function to deallocate the resource.
+The problem here is of course that a raw pointer could also point to some static memory that cannot be
+deallocated.
+----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

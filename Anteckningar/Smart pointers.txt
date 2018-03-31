@@ -1,0 +1,57 @@
+Smart pointers
+
+Smart pointers automate the process of allocating and deallocate memory, meaning
+keywords new and delete are not as necessary. It is basically a wrapper around 
+a normal raw pointer with this added functionality.
+
+When we create a smart pointer, it will call new for us to allocate memory(we don't
+have to worry about it). Depending on what kind of smart pointer is created,
+the memory will eventually be freed automatically, (no need to manually delete).
+
+In order to use smart pointer we have to #include <memory>.
+
+
+Different types of smart pointers:
+__________________________________________________________________________
+Unique pointer:
+A scoped pointer, meaning the memory will be freed when we reach end of scope.
+They have to be unique (it can't be copied which is a disadvantage). 
+
+construction: 
+std::unique_ptr<TYPE> NAME(new TYPE());     OR
+std::unique_ptr<TYPE> NAME = std::make_unique<TYPE>();  <---- PREFFERED!(due to exception safety)
+
+This is the simplest smart pointer. 
+__________________________________________________________________________
+Shared pointer:
+smart pointer that can be shared. Works via reference counting(you keep track of 
+how many references you have to the pointer). As soon as the number of references
+to the pointer reaches 0, the pointer is deleted.
+
+Construction:
+std::shared_ptr<TYPE> NAME = std::make_shared<TYPE>();
+
+Upon creation, a shared pointer also allocates memory for a "Control block"
+where the reference count is stored. It is possible to create a shared pointer
+by passing new TYPE to the constructor(see unique pointer) but in this case it is
+much more innefficient than using make_shared<>(); due to the need to allocate
+memory for the control block.
+
+The shared pointer can be copied via assignment operator =
+Has a bit of an overhead.
+---------------------------------------------------------------------------
+Weak pointer:
+Used together with shared pointer. The difference is that a weak pointer does not
+affect the reference count:
+When a shared pointer is assigned a shared pointer ---> reference count increases
+When a weak pointer is assigned a shared pointer ---> reference count doesn't change.
+
+This is useful when we don't want to take ownership of the entity. You can ask a 
+weak pointer if it is still valid.
+
+Smart pointers prevents us from getting memory leaks if we forget to delete a ponter.
+
+
+
+
+

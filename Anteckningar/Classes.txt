@@ -1,0 +1,18 @@
+Classes is a feature of object oriented programming.
+
+A class is a way to group data and functionality together.
+
+construction:
+class NAME
+{
+   ....
+};
+
+___________________________________________________
+Class VS struct:
+There is basically no difference between classes and structs. Theres is one small
+difference that has to do with visibility: a class is private by default, while
+a struct is public by default.
+
+structs basically exists to be backwards compatible with c. 
+

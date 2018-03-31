@@ -1,0 +1,35 @@
+keyword: const
+
+Kinda has to do with visibility for classes and structs. A mechanism that can enforce rules.
+
+A promise that something should be constant. (This can however be circumvented if need be)
+
+We declare a variable as const when we don't want it to change. It's an invariable variable! :D
+
+Other uses:
+_________________________________________________________________________________________________________
+Pointers: 
+With pointers that are not marked as const, we can modify the dereferenced value, and we can
+can also change which memory address the pointer is pointing at(redirect the pointer).
+
+By declaring a pointer const (ex. const int* a = new int;) we can no longer modify the contents of that pointer.
+It is still possibly however to redirect the pointer to another address.
+
+If the const keyword is instead placed after the type AND pointer sign (ie. int* const a = new int;) we get kind of the opposite.
+The contents of the pointer can be modified, but the pointer itself cannot be redirected to a new address.
+
+If the const keyword is placed as (int const* a = new int;), it's the same as (ex. const int* a = new int;).
+
+It is possible to combine this to get (const int* const a = new int;). Now neither content nor address can be changed.
+
+________________________________________________________________________________________________________
+Classes and functions:
+
+A function can be marked as const by placing the const after the argument list of the function
+(ex. int get() const). This means that this function is not going to modify the actual class in any way,
+(i.e. changing class member variables and things like that). Its good practice to define all functions that do 
+not change class members as const.
+
+If we pass a class as a parameter to a function and we pass it by const reference (i.e. const Class& c),
+we cannot modify the class object. This makes it so we cannot call non-const functions for that object.
+Because of this, there are usually two versions of the same method: one const and one non-const

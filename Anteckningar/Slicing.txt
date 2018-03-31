@@ -1,0 +1,11 @@
+Slicing : when you assign a derived class to a base class
+
+Ex.
+
+base class: Fruit()
+derived class: Apple()
+
+Fruit f = new Apple();
+
+This removes the derived part from it. As such, we  remove any derived parts from the
+derived instance, leaving only the base class parts.

@@ -1,0 +1,16 @@
+Member or non-member operators
+_______________________________
+Always member functions: =(assignment), [](subscription), ->(member access), 
+()(function call)
+
+Always friend fucntions: <<(outstream), >>(instream)
+
+All other operators can be either member or non-members.
+RULE OF THUMB:
+1. if it is a unary operator -> it is a member function
+2. if a binary operator treats both operands equally(it leaves them unchanged)
+   -> it is a non-member function.
+3. if a binary operator doesn't treat both operands equally(left operand usually
+   changes) -> make member function of left operands type.
+
+There are of course exceptions to this rule.

@@ -1,0 +1,73 @@
+Templates
+
+A template basically allows the compiler to write code for us, given a set of rules.
+A template can be a blueprint for a function or class with different types but similar
+structure/functionality.
+
+Templates are object oriented cosntructs a.k.a. compile time polymorhism
+________________________________________________________________________________________
+Function templates
+
+A situation in which templates are useful is when we define a function that we want to
+work the same for several different types input or output. By using templates, we don't
+have to define many different overloads of the same function, only defining it once.
+
+syntax:
+template<typename T> <---(typename can be replaced with keyword class, semantically the same)
+void function(T value)
+{
+	...
+}
+
+A template function will be evaulated at compile time. 
+Template code isn't actual real code, the 'real' code is only created when we call the
+template for some concrete type.
+
+The typename parameter(in this case called T) is replaced what whatever type we use when
+we call the template function. 
+
+The type the template will use is often implicit, based on the arguments, 
+ex. call to function(4) will implicitly compile the template with type int. 
+It is possible to explicitly specify what T will become by adding <type> after the function
+name (i.e. function<int>(4)).
+
+NOTE: Do not specialize a function template unless needed 
+
+__________________________________________________________________________________________
+Class templates
+
+Class templates work much the same way as function templates.
+
+It is possible to define a concrete type instead of using typename when we define a template.
+This is useful when we want create something upon compile time, such as an array
+
+Ex.
+template<int N>
+class Array
+{
+private:
+	int m_array[N];
+public:
+	int GetSize() const { return N}
+}
+
+Calling Array<5> array, replaces N with integer 5 in the template, creating an array with 
+5 slots.
+
+
+it is possible to have more than one template parameter (ex. template<typename T, int N>)
+__________________________________________________________________________________________
+Process of overload resolution
+
+following steps are don to find a function to match a call:
+
+1. if there is a normal function that exactly matches the call, that function is selected
+2. if a function template can be instantiated to exactly match the call, that specialization 
+   is selected, else
+3. if type conversion can be applied to the arguments, allowing a normal function to be used 
+   as a unique best match, that function is selected, else
+4. overload resolution fails ¡V either no function matches the call, or the call is ambiguous
+
+
+
+

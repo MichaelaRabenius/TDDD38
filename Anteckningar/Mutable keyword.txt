@@ -1,0 +1,13 @@
+Keyword: mutable.
+
+*indicates that something can be changed (as opposed to const). Kinda const, but can be changed.
+
+If we have a const function, we are not able to change any internal private variable from with in that
+function (they remain constant). However, if we for some reason need to be able to change a variable
+from within this const function, we can declare it mutable, which allows the variable to be changed.
+-> we allow constant functions to change the variable!
+
+The other use: (with lambdas)
+Note: a lambda expression is basically a quick small function we can assign to a variable on the fly.
+
+By declaring the lambda expression as mutable, variables passed by value to the lambda can be changed.

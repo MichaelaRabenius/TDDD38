@@ -1,0 +1,5 @@
+Lambda Expressions
+
+A lambda function is a function we write inline in the source code. Lambdas make creating 
+quick funktions become much easier.
+
